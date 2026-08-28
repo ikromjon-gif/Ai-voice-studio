@@ -1,308 +1,227 @@
----
-title: AI Voice Studio
-emoji: 🌱
-colorFrom: green
-colorTo: emerald
-sdk: gradio
-sdk_version: "6.10.0"
-app_file: app.py
-pinned: false
----
+# 🎙️ AI Voice Studio
 
-🎙️ AI Voice Studio
+> **Multilingual Speech AI for Text-to-Speech, Speech-to-Text, and Audio Enhancement.**
 
-AI Voice Studio is a multilingual speech AI application for working with text, speech, and audio in Uzbek, English, and Korean.
+AI Voice Studio is a practical multilingual Speech AI application built with open-source models and deployed on Hugging Face Spaces. It supports **Uzbek, English, and Korean** and is designed as a portfolio project demonstrating model integration, inference optimization, multilingual UI/UX, and GPU/CPU-ready deployment.
 
-The project is designed as a practical portfolio project demonstrating how open-source speech models can be integrated into a modern, responsive AI application and deployed with Hugging Face Spaces.
+## 🚀 Live Demo
 
-✨ Features
+👉 **[Try AI Voice Studio on Hugging Face Spaces](https://huggingface.co/spaces/IKROMJON01/AI-voice-Studio)**
 
-📝 Text → Speech
+## ✨ Features
 
-Convert text into natural-sounding speech.
+### 📝 Text → Speech
 
-Supported languages:
+Convert text into speech with language-specific Hugging Face MMS TTS models.
 
-🇺🇿 Uzbek
+- 🇺🇿 Uzbek
+- 🇬🇧 English
+- 🇰🇷 Korean
+- Lazy model loading to reduce startup memory usage
+- Uzbek Latin-to-Cyrillic preprocessing for the selected MMS checkpoint
 
-🇬🇧 English
+### 🎤 Speech → Text
 
-🇰🇷 Korean
+Transcribe uploaded or recorded speech using **Whisper Large V3 Turbo**.
 
-🎤 Speech → Text
+- 🇺🇿 Uzbek
+- 🇬🇧 English
+- 🇰🇷 Korean
+- Upload or microphone input
+- Language-aware transcription
 
-Transcribe uploaded or recorded audio using a multilingual speech recognition model.
+### 🔊 Audio Enhancement
 
-Supported languages:
+A lightweight audio preprocessing pipeline for improving recorded speech:
 
-🇺🇿 Uzbek
+- Noise reduction
+- Silence trimming
+- Peak normalization
+- WAV output
 
-🇬🇧 English
+### 👤 Voice Cloning
 
-🇰🇷 Korean
+The application includes a dedicated voice-cloning interface and responsible-use guidance. The current public version keeps the cloning model disabled until a suitable multilingual cloning model is integrated and tested for the target languages.
 
-🔊 Audio Enhancement
+> **Responsible use:** only use your own voice or voice samples for which you have explicit permission. Do not use voice cloning for unauthorized impersonation.
 
-Improve recorded audio with:
+## 🌍 Multilingual Interface
 
-Noise reduction
+The **entire interface** can be switched between:
 
-Silence trimming
+- 🇺🇿 **O'zbek**
+- 🇬🇧 **English**
+- 🇰🇷 **한국어**
 
-Audio normalization
+Changing the interface language updates navigation, headings, labels, buttons, descriptions, developer information, and other visible UI text.
 
-👤 Voice Cloning
+The feature-level language selectors independently provide the three supported languages for TTS, STT, and the voice-cloning interface.
 
-A dedicated voice-cloning interface is included in the application architecture.
+## 🧠 Models
 
-Voice cloning model integration is planned for the next development stage. The current version does not claim active voice cloning functionality.
+### Text → Speech
 
-🌍 Multilingual Interface
+| Language | Model |
+|---|---|
+| 🇺🇿 Uzbek | `facebook/mms-tts-uzb-script_cyrillic` |
+| 🇬🇧 English | `facebook/mms-tts-eng` |
+| 🇰🇷 Korean | `facebook/mms-tts-kor` |
 
-The entire user interface is localized for:
+### Speech → Text
 
-🇺🇿 O'zbek
+| Task | Model |
+|---|---|
+| Multilingual ASR | `openai/whisper-large-v3-turbo` |
 
-🇬🇧 English
+Models are loaded **lazily**, meaning a model is loaded only when its corresponding feature is used. This helps reduce unnecessary CPU/RAM/VRAM usage in constrained deployment environments.
 
-🇰🇷 한국어
+## 🏗️ Architecture
 
-Changing the interface language also updates navigation labels, buttons, headings, descriptions, and other visible UI text.
+```text
+                         AI Voice Studio
+                                │
+             ┌──────────────────┼──────────────────┐
+             │                  │                  │
+             ▼                  ▼                  ▼
+       Text → Speech      Speech → Text      Audio Enhancement
+             │                  │                  │
+             ▼                  ▼                  ▼
+        Facebook MMS         Whisper       Librosa + Noisereduce
+         UZ / EN / KO      Large V3 Turbo        + SciPy
+             │                  │                  │
+             └──────────────────┼──────────────────┘
+                                ▼
+                         Audio / Text Output
+```
 
-🧠 Models
+## 🛠️ Tech Stack
 
-The current implementation uses open-source Hugging Face models:
+- Python 3.10
+- PyTorch
+- Transformers
+- Gradio
+- Hugging Face Spaces
+- Hugging Face Spaces SDK
+- Whisper
+- Facebook MMS TTS
+- Librosa
+- SoundFile
+- Noisereduce
+- SciPy
+- NumPy
 
-Text → Speech
+## ⚡ Deployment
 
-facebook/mms-tts-uzb-script_cyrillic
+The project is structured for **Hugging Face Spaces** and uses `@spaces.GPU` for inference functions so the same application can run with ZeroGPU-style dynamic GPU allocation when available.
 
-facebook/mms-tts-eng
+The application also contains CPU-compatible inference logic and can be adapted to normal CPU or NVIDIA GPU hardware.
 
-facebook/mms-tts-kor
+### Current deployment configuration
 
-The Uzbek MMS model uses Cyrillic input, so the application includes a lightweight Latin-to-Cyrillic conversion step for Uzbek text.
-
-Speech → Text
-
-openai/whisper-large-v3-turbo
-
-Models are loaded lazily to reduce unnecessary memory usage and improve application startup.
-
-🛠️ Tech Stack
-
-Python 3.10
-
-Gradio 6
-
-PyTorch
-
-Transformers
-
+```text
 Hugging Face Spaces
+        │
+        ▼
+   Gradio App
+        │
+   ┌────┴────┐
+   │         │
+ CPU path   GPU path
+   │         │
+   └────┬────┘
+        ▼
+ Speech AI Models
+```
 
-Hugging Face Hub
+## 📁 Project Structure
 
-Whisper
-
-Facebook MMS TTS
-
-Librosa
-
-SoundFile
-
-Noisereduce
-
-SciPy
-
-NumPy
-
-Spaces SDK / ZeroGPU-compatible architecture
-
-🏗️ Architecture
-
-                    ┌─────────────────────┐
-                    │   AI Voice Studio   │
-                    └──────────┬──────────┘
-                               │
-              ┌────────────────┼────────────────┐
-              │                │                │
-              ▼                ▼                ▼
-       Text → Speech     Speech → Text    Audio Enhancement
-              │                │                │
-              ▼                ▼                ▼
-          MMS TTS           Whisper       Librosa +
-       UZ / EN / KO         Multilingual   Noisereduce
-              │                │                │
-              └────────────────┼────────────────┘
-                               ▼
-                         Audio / Text
-
-🎨 UI / UX
-
-The interface follows a clean green-and-white visual system with:
-
-Responsive layout
-
-Animated navigation
-
-Multilingual navigation labels
-
-Clear feature panels
-
-Accessible controls
-
-Modern cards and visual hierarchy
-
-Developer/portfolio section
-
-Mobile-friendly styling
-
-The application is intended to be easy to demonstrate during technical interviews and portfolio reviews.
-
-⚡ Deployment
-
-The application is designed for deployment on Hugging Face Spaces.
-
-The inference functions use the Spaces GPU decorator so the same application architecture can be adapted to ZeroGPU or other GPU hardware when available.
-
-The code also includes CPU-compatible execution logic for environments where CUDA is unavailable.
-
-📁 Project Structure
-
-AI-voice-Studio/
-│
+```text
+Ai-voice-studio/
 ├── app.py
 ├── README.md
 ├── requirements.txt
 ├── logo.png
 └── portfoliyo.jpg
+```
 
-Assets
+- `app.py` — Gradio application, model loading, inference, multilingual UI, and styling
+- `requirements.txt` — Python dependencies
+- `logo.png` — AI Voice Studio branding
+- `portfoliyo.jpg` — developer profile image
 
-logo.png — AI Voice Studio branding/logo
+## 💻 Run Locally
 
-portfoliyo.jpg — developer profile image
-
-🚀 Run Locally
-
-Clone the repository:
-
-git clone https://huggingface.co/spaces/IKROMJON01/AI-voice-Studio
-cd AI-voice-Studio
-
-Install dependencies:
-
+```bash
+git clone https://github.com/ikromjon-gif/Ai-voice-studio.git
+cd Ai-voice-studio
 pip install -r requirements.txt
-
-Run the application:
-
 python app.py
+```
 
-Then open the local Gradio interface shown in the terminal.
+The application will start with the local Gradio interface shown in the terminal.
 
-🔒 Responsible AI
+## 🔒 Responsible AI
 
-Speech technologies can be powerful and should be used responsibly.
+AI-generated speech and voice technologies can be misused. This project follows a responsible-use approach:
 
-For voice cloning, use only:
+- Use voice cloning only with your own voice or explicit permission.
+- Do not impersonate another person without authorization.
+- Treat generated speech as synthetic content.
+- Do not use model output as a substitute for professional or safety-critical decisions.
 
-Your own voice
+## 📌 Current Status
 
-Voice samples for which you have explicit permission
+| Feature | Status |
+|---|---|
+| 📝 Uzbek TTS | ✅ Available |
+| 📝 English TTS | ✅ Available |
+| 📝 Korean TTS | ✅ Available |
+| 🎤 Uzbek STT | ✅ Available |
+| 🎤 English STT | ✅ Available |
+| 🎤 Korean STT | ✅ Available |
+| 🔊 Audio Enhancement | ✅ Available |
+| 🌍 Uzbek / English / Korean UI | ✅ Available |
+| 📱 Responsive UI | ✅ Available |
+| 👤 Voice Cloning UI | 🧩 Architecture ready |
+| 👤 Voice Cloning model | 🚧 Next stage |
 
-Do not use the application to impersonate another person without authorization.
-
-📌 Current Status
-
-Feature
-
-Status
-
-Text → Speech
-
-✅ Available
-
-Uzbek TTS
-
-✅ Available
-
-English TTS
-
-✅ Available
-
-Korean TTS
-
-✅ Available
-
-Speech → Text
-
-✅ Available
-
-Uzbek STT
-
-✅ Available
-
-English STT
-
-✅ Available
-
-Korean STT
-
-✅ Available
-
-Audio Enhancement
-
-✅ Available
-
-Multilingual UI
-
-✅ Available
-
-Responsive UI
-
-✅ Available
-
-Voice Cloning UI
-
-🧩 Architecture ready
-
-Voice Cloning Model
-
-🚧 Next stage
-
-🎯 Portfolio Goal
+## 🎯 Portfolio Focus
 
 AI Voice Studio demonstrates practical experience in:
 
-Speech AI
+- Speech AI
+- Text-to-Speech (TTS)
+- Automatic Speech Recognition (ASR)
+- Multilingual AI
+- Audio preprocessing
+- Transformer-based model integration
+- Lazy model loading
+- CPU/GPU inference
+- Hugging Face deployment
+- Gradio UI/UX development
+- Responsible AI design
 
-Natural Language Processing
+## 🔬 Project Direction
 
-Multilingual AI
+Future development may include:
 
-Text-to-Speech
+- High-quality multilingual voice cloning
+- Better Korean and English voice quality
+- Additional Uzbek speech models
+- Speaker/style controls
+- Speech segmentation and timestamps
+- More advanced audio restoration
+- API deployment for external applications
 
-Automatic Speech Recognition
+## 👨‍💻 Developer
 
-Audio preprocessing
+**TOJIBOEV IKROMJON MAHKHAMBOY UGLI**  
+AI/ML Engineer · Computer Engineering · Chonnam National University
 
-Model integration
+📧 **ikromjonkorealife@gmail.com**
 
-GPU/CPU inference
+Focused on practical AI applications, Speech AI, Computer Vision, and open-source machine learning models.
 
-Hugging Face deployment
+---
 
-Gradio application development
-
-Responsible AI design
-
-👨‍💻 Developer
-
-TOJIBOEV IKROMJON MAHKHAMBOY UGLI
-
-AI/ML Engineer focused on practical AI applications, Speech AI, Computer Vision, and open-source machine learning models.
-
-📧 ikromjonkorealife@gmail.com
-
-AI Voice Studio · Open-source Speech AI · UZ / EN / KO
+⭐ **AI Voice Studio** — Open-source Speech AI for **UZ / EN / KO**.
