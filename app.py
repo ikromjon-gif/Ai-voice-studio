@@ -291,9 +291,9 @@ I18N = {
         "language": "Til",
         "text": "Matn",
         "reference": "Namuna ovoz",
-        "generate": I18N["uz"]["generate"],
+        "generate": "Ovoz yaratish",
         "transcribe": "Matnga aylantirish",
-        "enhance": I18N["uz"]["enhance"],
+        "enhance": "Audio yaxshilash",
         "output": "Natija audio",
         "transcript": "Transkripsiya",
         "denoise": "Shovqinni kamaytirish",
@@ -318,7 +318,7 @@ I18N = {
         "badge_gpu": "⚡ ZeroGPU tayyor",
         "developer": "Dasturchi",
         "developer_bio": "AI/ML Engineer — amaliy AI, Speech AI, Computer Vision va open-source modellar ustida ishlaydi.",
-        "footer": "🌱 AI Voice Studio · Open-source Speech AI · CPU/GPU tayyor",
+        "footer": "🌱 AI Voice Studio · Open-source Speech AI · CPU/GPU qo'llab-quvvatlanadi",
     },
     "en": {
         "title": "AI Voice Studio",
@@ -331,7 +331,7 @@ I18N = {
         "text": "Text",
         "reference": "Reference Voice",
         "generate": "Generate Speech",
-        "transcribe": I18N["uz"]["transcribe"],
+        "transcribe": "Transcribe",
         "enhance": "Enhance Audio",
         "output": "Generated Audio",
         "transcript": "Transcript",
@@ -357,7 +357,7 @@ I18N = {
         "badge_gpu": "⚡ ZeroGPU Ready",
         "developer": "Developer",
         "developer_bio": "AI/ML Engineer focused on practical AI, Speech AI, Computer Vision, and open-source models.",
-        "footer": "🌱 AI Voice Studio · Open-source Speech AI · CPU/GPU Ready",
+        "footer": "🌱 AI Voice Studio · Open-source Speech AI · CPU/GPU Supported",
     },
     "ko": {
         "title": "AI Voice Studio",
@@ -491,6 +491,21 @@ footer { display: none !important; }
     font-size: 29px;
     animation: floatMark 3s ease-in-out infinite;
 }
+.brand-logo {
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
+    display: block;
+    border-radius: 12px;
+}
+.developer-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 18px;
+    display: block;
+}
+
 .hero h1 {
     margin: 0;
     color: #14532d;
@@ -960,7 +975,7 @@ with gr.Blocks(title=APP_TITLE) as demo:
                 f'<div class="panel-title">{t["nav_tts"]}</div>'
                 f'<div class="panel-subtitle">{t["panel_tts"]}</div>'
             ),
-            gr.Dropdown(label=t["language"]),
+            gr.Dropdown(label=t["language"], value=tts_language.value),
             gr.Textbox(label=t["text"], placeholder=t["tts_placeholder"]),
             t["tts_info"],
             gr.Button(value=t["generate"], variant="primary", size="lg"),
@@ -970,7 +985,7 @@ with gr.Blocks(title=APP_TITLE) as demo:
                 f'<div class="panel-title">{t["nav_stt"]}</div>'
                 f'<div class="panel-subtitle">{t["panel_stt"]}</div>'
             ),
-            gr.Dropdown(label=t["language"]),
+            gr.Dropdown(label=t["language"], value=stt_language.value),
             gr.Audio(label=t["audio"]),
             gr.Button(value=t["transcribe"], variant="primary", size="lg"),
             gr.Textbox(label=t["transcript"]),
@@ -980,7 +995,7 @@ with gr.Blocks(title=APP_TITLE) as demo:
                 f'<div class="panel-subtitle">{t["panel_clone"]}</div>'
             ),
             t["clone_info"],
-            gr.Dropdown(label=t["language"]),
+            gr.Dropdown(label=t["language"], value=clone_language.value),
             gr.Audio(label=t["reference"]),
             gr.Textbox(label=t["text"], placeholder=t["clone_placeholder"]),
             gr.Button(value=t["coming_next"], interactive=False),
