@@ -1,5 +1,7 @@
 import os
 import re
+import base64
+from pathlib import Path
 
 # Import spaces before torch: ZeroGPU installs its CUDA emulation hooks here.
 import spaces
@@ -289,9 +291,9 @@ I18N = {
         "language": "Til",
         "text": "Matn",
         "reference": "Namuna ovoz",
-        "generate": "Ovoz yaratish",
+        "generate": I18N["uz"]["generate"],
         "transcribe": "Matnga aylantirish",
-        "enhance": "Audio yaxshilash",
+        "enhance": I18N["uz"]["enhance"],
         "output": "Natija audio",
         "transcript": "Transkripsiya",
         "denoise": "Shovqinni kamaytirish",
@@ -311,6 +313,12 @@ I18N = {
         "coming_next": "Ovoz klonlash modeli — keyingi bosqichda",
         "tts_placeholder": "Matn kiriting...",
         "clone_placeholder": "Ovoz klonlash uchun matn kiriting...",
+        "badge_speech": "🎙️ Nutq AI",
+        "badge_languages": "🌍 UZ · EN · KO",
+        "badge_gpu": "⚡ ZeroGPU tayyor",
+        "developer": "Dasturchi",
+        "developer_bio": "AI/ML Engineer — amaliy AI, Speech AI, Computer Vision va open-source modellar ustida ishlaydi.",
+        "footer": "🌱 AI Voice Studio · Open-source Speech AI · CPU/GPU tayyor",
     },
     "en": {
         "title": "AI Voice Studio",
@@ -323,7 +331,7 @@ I18N = {
         "text": "Text",
         "reference": "Reference Voice",
         "generate": "Generate Speech",
-        "transcribe": "Transcribe",
+        "transcribe": I18N["uz"]["transcribe"],
         "enhance": "Enhance Audio",
         "output": "Generated Audio",
         "transcript": "Transcript",
@@ -343,7 +351,13 @@ I18N = {
         "audio": "Audio",
         "coming_next": "Voice cloning model — coming next",
         "tts_placeholder": "Enter text...",
-        "clone_placeholder": "Enter text for voice cloning...",
+        "clone_placeholder": "Enter the text for voice cloning...",
+        "badge_speech": "🎙️ Speech AI",
+        "badge_languages": "🌍 UZ · EN · KO",
+        "badge_gpu": "⚡ ZeroGPU Ready",
+        "developer": "Developer",
+        "developer_bio": "AI/ML Engineer focused on practical AI, Speech AI, Computer Vision, and open-source models.",
+        "footer": "🌱 AI Voice Studio · Open-source Speech AI · CPU/GPU Ready",
     },
     "ko": {
         "title": "AI Voice Studio",
@@ -377,21 +391,71 @@ I18N = {
         "coming_next": "음성 클로닝 모델 — 다음 단계에서 제공",
         "tts_placeholder": "텍스트를 입력하세요...",
         "clone_placeholder": "음성 클로닝을 위한 텍스트를 입력하세요...",
+        "badge_speech": "🎙️ Speech AI",
+        "badge_languages": "🌍 UZ · EN · KO",
+        "badge_gpu": "⚡ ZeroGPU 지원",
+        "developer": "개발자",
+        "developer_bio": "AI/ML Engineer — 실용 AI, Speech AI, Computer Vision 및 오픈소스 모델을 개발합니다.",
+        "footer": "🌱 AI Voice Studio · 오픈소스 Speech AI · CPU/GPU 지원",
     },
 }
 
 
+def local_image_data(filename, fallback=""):
+    """Load a Space-local image as a data URI."""
+    candidates = [
+        Path(filename),
+        Path(filename.lower()),
+        Path(filename.upper()),
+    ]
+    # Also find the file case-insensitively in the Space root.
+    target = Path(filename).name.lower()
+    try:
+        for item in Path(".").iterdir():
+            if item.is_file() and item.name.lower() == target:
+                candidates.insert(0, item)
+    except Exception:
+        pass
+
+    for path in candidates:
+        if not path.exists() or not path.is_file():
+            continue
+        try:
+            suffix = path.suffix.lower()
+            mime = "image/png" if suffix == ".png" else "image/jpeg"
+            encoded = base64.b64encode(path.read_bytes()).decode("utf-8")
+            return f"data:{mime};base64,{encoded}"
+        except Exception:
+            continue
+    return fallback
+
+
+LOGO_DATA = local_image_data("logo.png")
+PORTFOLIO_DATA = local_image_data("portfoliyo.jpg")
+
+print(
+    "[AI Voice Studio] assets: "
+    f"logo={'OK' if LOGO_DATA else 'MISSING'}, "
+    f"portfolio={'OK' if PORTFOLIO_DATA else 'MISSING'}"
+)
+
+
 def hero_html(language):
     t = I18N[language]
+    logo = (
+        f'<img src="{LOGO_DATA}" alt="AI Voice Studio logo" class="brand-logo">'
+        if LOGO_DATA else
+        '<div class="brand-mark">🎙️</div>'
+    )
     return f"""
     <div class="hero">
-        <div class="brand-mark">🌱</div>
+        <div class="brand-mark">{logo}</div>
         <h1>{t["title"]}</h1>
         <p>{t["subtitle"]}</p>
         <div class="badges">
-            <span>🎙️ Speech AI</span>
-            <span>🌍 UZ · EN · KO</span>
-            <span>⚡ ZeroGPU Ready</span>
+            <span>{t["badge_speech"]}</span>
+            <span>{t["badge_languages"]}</span>
+            <span>{t["badge_gpu"]}</span>
         </div>
     </div>
     """
@@ -518,6 +582,91 @@ textarea, input {
     border-radius: 14px !important;
 }
 
+
+.developer-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    max-width: 760px;
+    margin: 28px auto 8px;
+    padding: 20px 22px;
+    border: 1px solid #bbf7d0;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 70%);
+    box-shadow: 0 10px 28px rgba(15,23,42,.06);
+    transition: transform .25s ease, box-shadow .25s ease;
+    animation: developerIn .55s ease both;
+}
+.developer-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 34px rgba(22,163,74,.12);
+}
+.developer-avatar {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: #16a34a;
+    font-size: 30px;
+    box-shadow: 0 8px 20px rgba(22,163,74,.18);
+}
+.developer-content {
+    min-width: 0;
+    text-align: left;
+}
+.developer-label {
+    color: #16a34a;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-bottom: 3px;
+}
+.developer-name {
+    color: #14532d;
+    font-size: 17px;
+    font-weight: 800;
+}
+.developer-email {
+    margin-top: 4px;
+    font-size: 13px;
+}
+.developer-email a {
+    color: #166534;
+    text-decoration: none;
+}
+.developer-email a:hover {
+    text-decoration: underline;
+}
+.developer-bio {
+    margin-top: 7px;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+}
+@keyframes developerIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 600px) {
+    .developer-card {
+        align-items: flex-start;
+        padding: 16px;
+    }
+    .developer-avatar {
+        width: 52px;
+        height: 52px;
+        flex-basis: 52px;
+        font-size: 24px;
+    }
+    .developer-name {
+        font-size: 14px;
+    }
+}
+
 @keyframes heroIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -611,11 +760,11 @@ with gr.Blocks(title=APP_TITLE) as demo:
                 ("🇰🇷 한국어", "ko"),
             ],
             value="en",
-            label="Til",
+            label=I18N["uz"]["language"],
         )
 
         tts_text = gr.Textbox(
-            label="Matn",
+            label=I18N["uz"]["text"],
             placeholder="Enter text / Matn kiriting / 텍스트를 입력하세요...",
             lines=8,
         )
@@ -629,7 +778,7 @@ with gr.Blocks(title=APP_TITLE) as demo:
         )
 
         tts_output = gr.Audio(
-            label="Natija audio",
+            label=I18N["uz"]["output"],
             type="filepath",
         )
 
@@ -655,11 +804,11 @@ with gr.Blocks(title=APP_TITLE) as demo:
                 ("🇰🇷 한국어", "ko"),
             ],
             value="en",
-            label="Til",
+            label=I18N["uz"]["language"],
         )
 
         stt_audio = gr.Audio(
-            label="Audio",
+            label=I18N["uz"]["audio"],
             type="filepath",
             sources=["upload", "microphone"],
         )
@@ -671,7 +820,7 @@ with gr.Blocks(title=APP_TITLE) as demo:
         )
 
         stt_output = gr.Textbox(
-            label="Transcript",
+            label=I18N["uz"]["transcript"],
             lines=12,
             interactive=False,
         )
@@ -700,17 +849,17 @@ with gr.Blocks(title=APP_TITLE) as demo:
                 ("🇺🇿 O'zbek", "uz"),
             ],
             value="en",
-            label="Language",
+            label=I18N["uz"]["language"],
         )
 
         clone_reference = gr.Audio(
-            label="Reference Voice",
+            label=I18N["uz"]["reference"],
             type="filepath",
             sources=["upload", "microphone"],
         )
 
         clone_text = gr.Textbox(
-            label="Text",
+            label=I18N["uz"]["text"],
             placeholder="Enter the text for voice cloning...",
             lines=7,
         )
@@ -732,7 +881,7 @@ with gr.Blocks(title=APP_TITLE) as demo:
         )
 
         fix_audio = gr.Audio(
-            label="Audio",
+            label=I18N["uz"]["audio"],
             type="filepath",
             sources=["upload", "microphone"],
         )
@@ -740,11 +889,11 @@ with gr.Blocks(title=APP_TITLE) as demo:
         with gr.Row():
             fix_denoise = gr.Checkbox(
                 value=True,
-                label="Shovqinni kamaytirish",
+                label=I18N["uz"]["denoise"],
             )
             fix_trim = gr.Checkbox(
                 value=True,
-                label="Jim qismlarni kesish",
+                label=I18N["uz"]["trim"],
             )
 
         fix_button = gr.Button(
@@ -754,7 +903,7 @@ with gr.Blocks(title=APP_TITLE) as demo:
         )
 
         fix_output = gr.Audio(
-            label="Natija audio",
+            label=I18N["uz"]["output"],
             type="filepath",
         )
 
@@ -764,10 +913,32 @@ with gr.Blocks(title=APP_TITLE) as demo:
             outputs=fix_output,
         )
 
-    footer = gr.Markdown(
+
+    # -----------------------------------------------------------------
+    # Developer / Portfolio
+    # -----------------------------------------------------------------
+    developer = gr.HTML(
+        f"""
+        <div class="developer-card">
+            <div class="developer-avatar">
+                {f'<img src="{PORTFOLIO_DATA}" alt="Developer">' if PORTFOLIO_DATA else '<span>👤</span>'}
+            </div>
+            <div class="developer-content">
+                <div class="developer-label">{I18N["uz"]["developer"]}</div>
+                <div class="developer-name">TOJIBOEV IKROMJON MAHKHAMBOY UGLI</div>
+                <div class="developer-email">
+                    📧 <a href="mailto:ikromjonkorealife@gmail.com">ikromjonkorealife@gmail.com</a>
+                </div>
+                <div class="developer-bio">{I18N["uz"]["developer_bio"]}</div>
+            </div>
+        </div>
         """
+    )
+
+    footer = gr.Markdown(
+        f"""
         <div style="text-align:center;margin-top:24px;padding:12px;color:#64748b;">
-            🌱 <b>AI Voice Studio</b> · Open-source speech AI · CPU/GPU ready
+            {I18N["uz"]["footer"]}
         </div>
         """
     )
@@ -824,6 +995,31 @@ with gr.Blocks(title=APP_TITLE) as demo:
             gr.Checkbox(label=t["trim"]),
             gr.Button(value=t["enhance"], variant="primary", size="lg"),
             gr.Audio(label=t["output"]),
+
+            gr.HTML(
+                f"""
+                <div class="developer-card">
+                    <div class="developer-avatar">
+                        {f'<img src="{PORTFOLIO_DATA}" alt="Developer">' if PORTFOLIO_DATA else '<span>👤</span>'}
+                    </div>
+                    <div class="developer-content">
+                        <div class="developer-label">{t["developer"]}</div>
+                        <div class="developer-name">TOJIBOEV IKROMJON MAHKHAMBOY UGLI</div>
+                        <div class="developer-email">
+                            📧 <a href="mailto:ikromjonkorealife@gmail.com">ikromjonkorealife@gmail.com</a>
+                        </div>
+                        <div class="developer-bio">{t["developer_bio"]}</div>
+                    </div>
+                </div>
+                """
+            ),
+            gr.Markdown(
+                f"""
+                <div style="text-align:center;margin-top:24px;padding:12px;color:#64748b;">
+                    {t["footer"]}
+                </div>
+                """
+            ),
         ]
 
     language_selector.change(
@@ -836,6 +1032,7 @@ with gr.Blocks(title=APP_TITLE) as demo:
             stt_heading, stt_language, stt_audio, stt_button, stt_output,
             clone_heading, clone_info, clone_language, clone_reference, clone_text, clone_disabled, clone_responsible,
             fix_heading, fix_audio, fix_denoise, fix_trim, fix_button, fix_output,
+            developer, footer,
         ],
     )
 
