@@ -1,0 +1,14 @@
+# Hugging Face manages Gradio and spaces for Spaces/ZeroGPU.
+# Keep PyTorch on a ZeroGPU-supported release.
+torch==2.11.0
+torchaudio==2.11.0
+
+transformers>=4.48,<6
+accelerate>=1.0
+safetensors
+librosa>=0.10
+soundfile
+noisereduce
+scipy
+numpy<2
+sentencepiece
